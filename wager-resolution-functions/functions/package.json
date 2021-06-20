@@ -1,0 +1,46 @@
+{
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "12"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "@koa/cors": "^3.1.0",
+    "axios": "^0.21.0",
+    "call-of-duty-api": "^1.2.16",
+    "currency.js": "^2.0.3",
+    "dayjs": "^1.9.5",
+    "dotenv": "^8.2.0",
+    "firebase-admin": "^8.10.0",
+    "firebase-functions": "^3.6.1",
+    "koa": "^2.13.0",
+    "koa-logger": "^3.2.1",
+    "koa-router": "^10.0.0",
+    "module-alias": "^2.2.2"
+  },
+  "devDependencies": {
+    "eslint": "^5.12.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-import-resolver-alias": "^1.1.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-promise": "^4.0.1",
+    "firebase-functions-test": "^0.2.0",
+    "nodemon": "^2.0.6",
+    "prettier": "^2.1.2"
+  },
+  "_moduleAliases": {
+    "@": ""
+  },
+  "private": true
+}

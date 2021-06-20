@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "kingpin-gg-staging",
+    "staging": "kingpin-gg-staging",
+    "prod": "kingpin-gg"
+  }
+}

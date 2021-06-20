@@ -1,0 +1,61 @@
+#!/bin/bash
+
+BASENAME="./$(basename "$0")"
+INFO="This script is used to manage ezgame GCP functions
+
+Usage:  $BASENAME COMMAND [ARGS...]
+
+Required tools:
+- pipenv
+- gcloud
+
+Commands:
+  install
+  serve
+  deploy
+"
+
+PRINT_PREFIX="-----------------\nkingpin callofduty functions\n-----------------\n"
+
+COLOR_RESET="\e[0m"
+COLOR_CYAN="\e[36m"
+
+GCF_PROJECT="kingpin-gg"
+GCF_OPTS_HTTP="--runtime python38 --trigger-http --allow-unauthenticated"
+GCF_OPTS_PUBSUB="--runtime python38 --trigger-resource update-match-outcomes --trigger-event google.pubsub.topic.publish"
+
+
+COMMAND="$1"; shift
+
+function print_info {
+  printf "${COLOR_CYAN}${PRINT_PREFIX}${COLOR_RESET}%s\n\n" "$1"
+}
+
+case "$COMMAND" in
+
+install)
+  print_info "- Initializing..."
+
+  pipenv install -r src/requirements.txt --three
+  python --version
+;;
+
+serve)
+  print_info "- Starting app..."
+
+  pipenv run nodemon src/local.py
+;;
+
+deploy)
+  print_info "- Deploying..."
+  cd src
+
+  gcloud config set project ${GCF_PROJECT}
+  # gcloud functions deploy send_slack_message --entry-point send_slack_message ${GCF_OPTS_HTTP}
+  gcloud functions deploy betting_odds --entry-point betting_odds ${GCF_OPTS_HTTP}
+  # gcloud functions deploy find_match_outcome --entry-point find_match_outcome ${GCF_OPTS_PUBSUB} --timeout 100s
+;;
+
+*)
+  echo "$INFO" >&2; exit 1
+esac

@@ -1,0 +1,89 @@
+image: node:12.13.0-alpine
+
+stages:
+  - build
+  - deploy
+
+# BUILD STAGING
+build_staging:
+  stage: build
+  environment:
+    name: staging
+  only:
+    - dev
+  variables:
+    VUE_APP_GCF_REGION: $VUE_APP_GCF_REGION
+    VUE_APP_FIREBASE_KEY: $VUE_APP_FIREBASE_KEY_STG
+    VUE_APP_FIREBASE_DOMAIN: $VUE_APP_FIREBASE_DOMAIN_STG
+    VUE_APP_FIREBASE_DATABASE: $VUE_APP_FIREBASE_DATABASE_STG
+    VUE_APP_FIREBASE_PROJECT_ID: $VUE_APP_FIREBASE_PROJECT_ID_STG
+    VUE_APP_FIREBASE_STORAGE_BUCKET: $VUE_APP_FIREBASE_STORAGE_BUCKET_STG
+    VUE_APP_FIREBASE_SENDER_ID: $VUE_APP_FIREBASE_SENDER_ID_STG
+    VUE_APP_FIREBASE_APP_ID: $VUE_APP_FIREBASE_APP_ID_STG
+    VUE_APP_FIREBASE_MEASUREMENT_ID: $VUE_APP_FIREBASE_MEASUREMENT_ID_STG
+    VUE_APP_PAYPAL_CLIENT_ID: $VUE_APP_PAYPAL_CLIENT_ID_STG
+  before_script:
+    - yarn config set cache-folder .yarn
+  script:
+    - yarn add @vue/cli-service@4.5.8
+    - yarn install
+    - yarn lint
+    - yarn build
+  artifacts:
+    paths:
+      - dist
+      - node_modules/**
+
+# BUILD PRODUCTION
+build_prod:
+  stage: build
+  environment:
+    name: prod
+  only:
+    - master
+  variables:
+    VUE_APP_GCF_REGION: $VUE_APP_GCF_REGION
+    VUE_APP_FIREBASE_KEY: $VUE_APP_FIREBASE_KEY_PROD
+    VUE_APP_FIREBASE_DOMAIN: $VUE_APP_FIREBASE_DOMAIN_PROD
+    VUE_APP_FIREBASE_DATABASE: $VUE_APP_FIREBASE_DATABASE_PROD
+    VUE_APP_FIREBASE_PROJECT_ID: $VUE_APP_FIREBASE_PROJECT_ID_PROD
+    VUE_APP_FIREBASE_STORAGE_BUCKET: $VUE_APP_FIREBASE_STORAGE_BUCKET_PROD
+    VUE_APP_FIREBASE_SENDER_ID: $VUE_APP_FIREBASE_SENDER_ID_PROD
+    VUE_APP_FIREBASE_APP_ID: $VUE_APP_FIREBASE_APP_ID_PROD
+    VUE_APP_FIREBASE_MEASUREMENT_ID: $VUE_APP_FIREBASE_MEASUREMENT_ID_PROD
+    VUE_APP_PAYPAL_CLIENT_ID: $VUE_APP_PAYPAL_CLIENT_ID_PROD
+  before_script:
+    - yarn config set cache-folder .yarn
+  script:
+    - yarn add @vue/cli-service@4.5.8
+    - yarn install
+    - yarn lint
+    - yarn build
+  artifacts:
+    paths:
+      - dist
+      - node_modules/**
+
+# DEPLOY TO STAGING
+deploy_staging:
+  stage: deploy
+  environment:
+    name: staging
+  only:
+    - dev
+  script:
+    - npm i -g firebase-tools@8.12.1
+    - firebase use staging --token $FIREBASE_DEPLOY_KEY
+    - firebase deploy --only hosting -m "Pipeline $CI_PIPELINE_ID, build $CI_BUILD_ID" --non-interactive --token $FIREBASE_DEPLOY_KEY
+
+# DEPLOY TO PRODUCTION
+deploy_prod:
+  stage: deploy
+  environment:
+    name: prod
+  only:
+    - master
+  script:
+    - npm i -g firebase-tools@8.12.1
+    - firebase use prod --token $FIREBASE_DEPLOY_KEY
+    - firebase deploy --only hosting -m "Pipeline $CI_PIPELINE_ID, build $CI_BUILD_ID" --non-interactive --token $FIREBASE_DEPLOY_KEY
